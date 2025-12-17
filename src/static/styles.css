@@ -1,3 +1,12 @@
+/* Hide bullet points and style delete icon */
+ul {
+  list-style-type: none;
+}
+
+.delete-icon {
+  cursor: pointer;
+  margin-left: 10px;
+}
 * {
   box-sizing: border-box;
   margin: 0;
@@ -141,4 +150,37 @@ footer {
   margin-top: 30px;
   padding: 20px;
   color: #666;
+}
+
+.participants {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed #eee;
+}
+
+.participants h5 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+}
+
+.participants ul {
+  list-style: disc;
+  padding-left: 20px;
+  margin: 0;
+  max-height: 110px;
+  overflow-y: auto;
+}
+
+.participants li {
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #555;
+}
+
+/* subtle muted text for empty state */
+.participants li.muted {
+  color: #999;
+  font-style: italic;
 }
