@@ -1,3 +1,12 @@
+/* Hide bullet points and style delete icon */
+ul {
+  list-style-type: none;
+}
+
+.delete-icon {
+  cursor: pointer;
+  margin-left: 10px;
+}
 * {
   box-sizing: border-box;
   margin: 0;

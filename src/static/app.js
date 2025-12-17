@@ -59,7 +59,13 @@ document.addEventListener("DOMContentLoaded", () => {
           participants.forEach((p) => {
             const li = document.createElement("li");
             li.textContent = p;
+            // Create delete icon
+            const deleteIcon = document.createElement('span');
+            deleteIcon.textContent = '🗑️'; // Unicode for delete icon
+            deleteIcon.className = 'delete-icon';
+            deleteIcon.onclick = () => unregisterParticipant(p, name);
             list.appendChild(li);
+            li.appendChild(deleteIcon);
           });
         } else {
           const li = document.createElement("li");
@@ -129,6 +135,61 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error signing up:", error);
     }
   });
+
+  // Function to unregister participant
+  async function unregisterParticipant(email, activityName = null) {
+    try {
+      // Ask the user to confirm
+      if (!confirm(`Unregister ${email}?`)) return;
+
+      // If activityName is not provided, try to determine it by searching the DOM
+      if (!activityName) {
+        const cards = Array.from(document.querySelectorAll('.activity-card'));
+        for (const card of cards) {
+          const lis = Array.from(card.querySelectorAll('li'));
+          if (lis.some(li => li.firstChild && li.firstChild.nodeValue === email)) {
+            const h4 = card.querySelector('h4');
+            if (h4) {
+              activityName = h4.textContent;
+              break;
+            }
+          }
+        }
+      }
+
+      if (!activityName) {
+        alert('Could not determine activity for that participant.');
+        return;
+      }
+
+      const response = await fetch(
+        `/activities/${encodeURIComponent(activityName)}/unregister?email=${encodeURIComponent(email)}`,
+        { method: 'POST' }
+      );
+
+      const result = await response.json();
+      if (response.ok) {
+        // Refresh activities list
+        await fetchActivities();
+        const messageDiv = document.getElementById('message');
+        messageDiv.textContent = result.message || 'Participant unregistered';
+        messageDiv.className = 'success';
+        messageDiv.classList.remove('hidden');
+        setTimeout(() => messageDiv.classList.add('hidden'), 5000);
+      } else {
+        const messageDiv = document.getElementById('message');
+        messageDiv.textContent = result.detail || 'Failed to unregister participant';
+        messageDiv.className = 'error';
+        messageDiv.classList.remove('hidden');
+      }
+    } catch (error) {
+      console.error('Error unregistering participant:', error);
+      const messageDiv = document.getElementById('message');
+      messageDiv.textContent = 'Failed to unregister. Please try again.';
+      messageDiv.className = 'error';
+      messageDiv.classList.remove('hidden');
+    }
+  }
 
   // Initialize app
   fetchActivities();
