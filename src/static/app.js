@@ -13,19 +13,68 @@ document.addEventListener("DOMContentLoaded", () => {
       // Clear loading message
       activitiesList.innerHTML = "";
 
-      // Populate activities list
+      // Reset activity select (keep placeholder)
+      if (activitySelect) {
+        activitySelect.innerHTML = '<option value="">-- Select an activity --</option>';
+      }
+
+      // Populate activities list with safe DOM nodes and a participants list
       Object.entries(activities).forEach(([name, details]) => {
         const activityCard = document.createElement("div");
         activityCard.className = "activity-card";
 
-        const spotsLeft = details.max_participants - details.participants.length;
+        // Title
+        const title = document.createElement("h4");
+        title.textContent = name;
 
-        activityCard.innerHTML = `
-          <h4>${name}</h4>
-          <p>${details.description}</p>
-          <p><strong>Schedule:</strong> ${details.schedule}</p>
-          <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
-        `;
+        // Description
+        const desc = document.createElement("p");
+        desc.textContent = details.description;
+
+        // Schedule
+        const schedule = document.createElement("p");
+        const scheduleStrong = document.createElement("strong");
+        scheduleStrong.textContent = "Schedule:";
+        schedule.appendChild(scheduleStrong);
+        schedule.appendChild(document.createTextNode(` ${details.schedule}`));
+
+        // Availability
+        const spotsLeft = details.max_participants - (details.participants?.length || 0);
+        const avail = document.createElement("p");
+        const availStrong = document.createElement("strong");
+        availStrong.textContent = "Availability:";
+        avail.appendChild(availStrong);
+        avail.appendChild(document.createTextNode(` ${spotsLeft} spots left`));
+
+        // Participants section
+        const participantsDiv = document.createElement("div");
+        participantsDiv.className = "participants";
+        const pTitle = document.createElement("h5");
+        pTitle.textContent = "Participants";
+        participantsDiv.appendChild(pTitle);
+
+        const list = document.createElement("ul");
+        const participants = details.participants || [];
+        if (participants.length > 0) {
+          participants.forEach((p) => {
+            const li = document.createElement("li");
+            li.textContent = p;
+            list.appendChild(li);
+          });
+        } else {
+          const li = document.createElement("li");
+          li.textContent = "No participants yet";
+          li.className = "muted";
+          list.appendChild(li);
+        }
+        participantsDiv.appendChild(list);
+
+        // Append everything to card
+        activityCard.appendChild(title);
+        activityCard.appendChild(desc);
+        activityCard.appendChild(schedule);
+        activityCard.appendChild(avail);
+        activityCard.appendChild(participantsDiv);
 
         activitiesList.appendChild(activityCard);
 
